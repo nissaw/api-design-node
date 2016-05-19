@@ -4,7 +4,8 @@ var logger = require('../../util/logger');
 
 exports.params = function(req, res, next, id) {
   Post.findById(id)
-    .populate('author')
+  // comma username assures that we don't send back the entire author obj < with pword etc > but just the username
+    .populate('author', 'username')
     .exec()
     .then(function(post) {
       if (!post) {

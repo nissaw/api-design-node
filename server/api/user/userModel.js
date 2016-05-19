@@ -35,6 +35,14 @@ UserSchema.methods = {
       var salt = bcrypt.genSaltSync(10);
       return bcrypt.hashSync(plainTextPword, salt);
     }
+  },
+  toJson: function(){
+    var obj = this.toObject();
+    // toObject is built into Mongoose converts from document to JS Object
+    // what is returned by find() etc by mongoose LOOKS like a JS object but it's really a
+    // document that has add'l methods on it (.save, .remove). toObject removes those
+    delete obj.password;
+    return obj;
   }
 };
 

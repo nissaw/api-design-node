@@ -4,6 +4,8 @@ var signToken = require('../../auth/auth').signToken;
 
 exports.params = function(req, res, next, id) {
   User.findById(id)
+    .select('-password') // removes password from returned doc
+    .exec()
     .then(function(user) {
       if (!user) {
         next(new Error('No user with that id'));
@@ -46,11 +48,13 @@ exports.put = function(req, res, next) {
   })
 };
 
+// refactored now making a user based on Mongo
 exports.post = function(req, res, next) {
   var newUser = new User(req.body);
 
   newUser.save(function(err, user) {
-    if(err) {next(err);}
+    // if there's an err need to return to quit this function
+    if(err) {return next(err);}
 
     var token = signToken(user._id);
     res.json({token: token});
@@ -66,3 +70,7 @@ exports.delete = function(req, res, next) {
     }
   });
 };
+
+exports.me = function(req, res){
+  res.json(req.user.toJson()); // toJson is a method defined in UserModel to scrape the password
+}
